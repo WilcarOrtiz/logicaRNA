@@ -18,7 +18,7 @@ dependencies:
     specifier: ^17.0.0
     version: 17.2.3(@angular/core@17.2.3)
   '@angular/core':
-    specifier: ^17.0.0
+    specifier: ^17.2.3
     version: 17.2.3(rxjs@7.8.1)(zone.js@0.14.4)
   '@angular/forms':
     specifier: ^17.0.0

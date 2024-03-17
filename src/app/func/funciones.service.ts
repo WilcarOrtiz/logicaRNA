@@ -91,7 +91,7 @@ export class FuncionesService {
     );
 
     if (!funcionEncontrada) {
-      throw new Error(`Función con código "${codigo}" no encontrada.`);
+      throw new Error(`Función "${codigo}" no encontrada.`);
     }
 
     return funcionEncontrada.funcion(...args);
