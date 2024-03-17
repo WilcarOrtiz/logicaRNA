@@ -1,0 +1,6 @@
+.linea {
+  background-color: #f00808; /* color verde-600 en Tailwind CSS */
+  margin: 12px; /* m-2 en Tailwind CSS */
+  height: 3px; /* Altura de la línea */
+  border: none; /* Quita el borde */
+}

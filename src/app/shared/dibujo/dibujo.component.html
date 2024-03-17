@@ -1,0 +1,80 @@
+<ngx-graph
+  class="chart-container container flex items-center justify-center"
+  [style.width.%]="100"
+  [style.height.%]="90"
+  [links]="links"
+  [autoCenter]="true"
+  [nodes]="nodos"
+  [layoutSettings]="{
+    orientation: 'LR',
+    marginX: 0,
+    marginY: 80,
+    spacing: 0
+  }"
+>
+  <ng-template #nodeTemplate let-node>
+    <svg:g class="node">
+      <!-- Cambiando el rectángulo por un círculo -->
+      <circle
+        [attr.cx]="node.x"
+        [attr.cy]="node.y"
+        [attr.r]="30"
+        [attr.fill]="getNodeColor(node.label)"
+        [attr.stroke-width]="1"
+        [attr.stroke]="node.isSelected ? '#f49600' : '#262626'"
+      />
+      <svg:text
+        text-anchor="middle"
+        alignment-baseline="middle"
+        [attr.x]="node.x"
+        [attr.y]="node.y"
+        [attr.letter-spacing]="0.1"
+        style="
+          font-weight: bold;
+          filter: drop-shadow(2px 2px 2px black);
+          font-size: 20px;
+        "
+        fill="white"
+      >
+        {{ node.label }}
+      </svg:text>
+    </svg:g>
+  </ng-template>
+
+  <svg:defs>
+    <svg:marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="20"
+      refY="5"
+      markerWidth="10"
+      markerHeight="10"
+    >
+      <svg:path d="M 0 0 L 10 5 L 0 10 z" fill="#08010E" />
+    </svg:marker>
+  </svg:defs>
+
+  <ng-template #linkTemplate let-link>
+    <svg:g class="edge">
+      <svg:path
+        class="line"
+        stroke="black"
+        fill="none"
+        [attr.d]="link.line"
+        [attr.marker-end]="
+          link.label === 'is parent of with arrow' ? 'url(#arrow)' : ''
+        "
+      />
+    </svg:g>
+  </ng-template>
+</ngx-graph>
+
+<div class="flex ml-24 mt-1 justify-between w-3/5">
+  <p class="font-bold" style="color: #2cd4c5">
+    <span style="font-size: 1.2em">E</span>: entrada
+  </p>
+  <p style="color: #05d5f9"><span style="font-size: 1.2em">N</span>: neurona</p>
+  <p style="color: #06308e">
+    <span style="font-size: 1.2em">S</span>: salida de la red
+  </p>
+</div>

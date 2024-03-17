@@ -1,0 +1,161 @@
+  private ObtenerPESDR(Data: Array<Array<number>>, M: number, N: number) {
+    const numCol = Data[0].length;
+    let PatronEntrada: number[] = [];
+    let SalidaDeseada: number[] = [];
+    for (let i = 1; i < Data.length; i++) {
+      const innerArray = Data[i];
+
+      for (let j = 0; j < innerArray.length; j++) {
+        const element = innerArray[j];
+        if (0 <= j && M > j) {
+          PatronEntrada.push(element);
+        }
+
+        if (j === M) {
+          this.PE.push(PatronEntrada);
+          PatronEntrada = [];
+        }
+        if (j <= M + N - (numCol - (M + N)) && j >= M) {
+          SalidaDeseada.push(element);
+        }
+        if (j === N) {
+          this.SD.push(SalidaDeseada);
+          SalidaDeseada = [];
+        }
+        if (j <= numCol && j > M + N - (numCol - (M + N))) {
+          this.Resultado.push(element);
+        }
+      }
+    }
+  }
+
+
+
+    console.log("______________________________________________");
+    console.log("Pesos", this.pesos);
+    console.log("Umbral", this.umbral);
+    console.log("Arreelgo: ", this.PE);
+    console.log("Arreelgo 1: ", this.PE[1]);
+    console.log("______________________________________________");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { Injectable } from "@angular/core";
+import { sum } from "d3";
+import { FuncionesService } from "../func/funciones.service";
+
+@Injectable({
+  providedIn: "root",
+})
+export class EntrenamientoService {
+  constructor(private funcion: FuncionesService) {}
+  //Datos del entrenamiento utilizados
+  pesos: number[][] = [];
+  umbral: number[] = [];
+  NSalidas: number = 0; //numero de salidas
+  NEntradas: number = 0; //numero de entradas
+  SD: number[][] = []; //Salida Esperada/deseada
+  Resultado: any[] = [];
+  PE: number[][] = []; //Patrones de entrada
+  YRi: number[] = []; //salida funcion activacion
+  EPi: number[] = []; // error del patron
+  CodActivacion: string = "";
+  CodAlgoEntrenamiento: string = "";
+  //no utilizados aun
+  ErrorIteracion: number = 0;
+  Si: number[] = []; //salida funcion soma
+  ErrorLineal: number[] = [];
+  ErrorPatron: number[] = [];
+
+  entrenamiento(
+    Data: Array<Array<number>>,
+    pesosEntrante: Array<Array<number>>,
+    umbralEntrante: Array<number>,
+    NumIteraciones: number,
+    RataAprendizaje: number,
+    ErrorMaximoPermitido: number,
+    Nentrada: number,
+    Nsalida: number,
+    Npatron: number,
+    CodActivacion: string,
+    CodAlgoEntrenamiento: string
+  ) {
+    this.NSalidas = Nsalida;
+    this.pesos = pesosEntrante;
+    this.umbral = umbralEntrante;
+    this.CodActivacion = CodActivacion;
+
+    this.ObtenerPESDR(Data, Nentrada, Nsalida);
+    this.Paso1_calcularSalidaFuncionSoma(this.PE[1]);
+    this.Paso2_calcularSalidaAtenuada();
+    this.Paso3_calcularSalidadDeLaRed();
+
+
+
+
+  }
+
+  private Paso3_calcularSalidadDeLaRed() {
+    this.YRi = this.funcion.ejecutarFuncion(this.CodActivacion, this.Si);
+    console.log("Salida de la red", ...this.YRi);
+  }
+
+  private Paso2_calcularSalidaAtenuada() {
+    console.log("Atenuacion");
+    for (let i = 0; i < this.Si.length; i++) {
+      console.log(this.Si[i], "-", this.umbral[i]);
+      this.Si[i] = parseFloat((this.Si[i] - this.umbral[i]).toFixed(1));
+    }
+    console.log("SALIDA ATENUADA: ", ...this.Si);
+  }
+
+  private Paso1_calcularSalidaFuncionSoma(S: Array<number>) {
+    let SumCol: number = 0;
+    for (let j = 0; j < this.NSalidas; j++) {
+      console.log(`Columna ${j + 1}:`);
+      for (let i = 0; i < this.pesos.length; i++) {
+        console.log(
+          S[i],
+          " * ",
+          this.pesos[i][j],
+          "=",
+          (S[i] * this.pesos[i][j]).toFixed(1)
+        );
+        SumCol += S[i] * this.pesos[i][j];
+      }
+      this.Si.push(parseFloat(SumCol.toFixed(1)));
+      SumCol = 0;
+    }
+    console.log("salida funcion soma: ", ...this.Si);
+  }
+
+  private ObtenerPESDR(Data: Array<Array<number>>, M: number, N: number) {
+    this.PE = Data.slice(1).map((row) => row.slice(0, M));
+    this.SD = Data.slice(1).map((row) => row.slice(M, M + N));
+    this.Resultado = Data.slice(1).flatMap((row) => row.slice(M + N));
+  }
+}
